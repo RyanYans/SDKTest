@@ -1,0 +1,36 @@
+// 1.maven-插件
+apply plugin: 'maven'
+
+def MAVEN_LOCAL_PATH = 'http://127.0.0.1:8081/repository/LibSDK2/'
+def ARTIFACT_ID = 'mySDK2'
+def VERSION_NAME = android.defaultConfig.versionName
+def GROUP_ID = 'com.yuanboning'
+def ACCOUNT = 'admin'
+def PASSWORD = 'admin123'
+
+//脚本：将Lib打成aar包上传至maven私有库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url:MAVEN_LOCAL_PATH ){
+                authentication(userName: ACCOUNT, password: PASSWORD)
+            }
+            pom.project {
+                groupId GROUP_ID
+                artifactId ARTIFACT_ID
+                version VERSION_NAME
+                packaging 'aar'
+            }
+        }
+    }
+}
+
+//以下代码会生成jar包源文件，如果是不开源码，请不要输入这段
+//aar包内包含注释
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+artifacts {
+    archives androidSourcesJar
+}
